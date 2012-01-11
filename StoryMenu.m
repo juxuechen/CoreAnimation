@@ -22,7 +22,10 @@
 @property (nonatomic, retain) StoryMenuItem *storyMenu;
 
 - (void)addStoryMenuItem;
-- (void)expandStoryMenu;
+- (void)startMenuAnimation;
+- (void)expandMenuStep1;
+- (void)expandMenuStep2;
+- (void)expandMenuStep3;
 - (void)closeStoryMenu;
 - (CAAnimationGroup *)blowupAnimationAtPoint:(CGPoint)point;
 - (CAAnimationGroup *)shrinkAnimationAtPoint:(CGPoint)point;
@@ -151,28 +154,46 @@
 - (void)setExpanding:(BOOL)expanding {
     _expanding = expanding;    
     
-    // rotate add button
-    float angle = self.isExpanding ? -M_PI : 0.0f;
-    [UIView animateWithDuration:0.2f animations:^{
-        _storyMenu.transform = CGAffineTransformMakeRotation(angle);
-    }];
-    
-    // expand or close animation
     if (!_timer) {
         _flag = self.isExpanding ? 0 : 2;
-        SEL selector = self.isExpanding ? @selector(expandStoryMenu) : @selector(closeStoryMenu);
+        SEL selector = self.isExpanding ? @selector(startMenuAnimation) : @selector(closeStoryMenu);
         _timer = [NSTimer scheduledTimerWithTimeInterval:TIME_OFFSET target:self selector:selector userInfo:nil repeats:YES];
     }
 }
 
-- (void)expandStoryMenu {
-    if (_flag == 3) {
-        [_timer invalidate];
-        
-        _timer = nil;
+- (void)startMenuAnimation {
+	if (_flag == 3) {
+        _flag = 0;
+		step += 1;
         return;
     }
-    
+
+	switch (step) {
+		case 1:
+			[self expandMenuStep1];
+			break;
+		case 2:
+			[self expandMenuStep1];
+			break;
+		case 3:
+			[self expandMenuStep1];
+			break;
+		case 4:
+			[_timer invalidate];
+			_timer = nil;
+			step = 0;
+			break;
+		default:
+			break;
+	}
+	
+	float angle = self.isExpanding ? -M_PI_2*step : 0.0f;
+	[UIView animateWithDuration:0.2f animations:^{
+		_storyMenu.transform = CGAffineTransformMakeRotation(angle);
+	}];
+}
+
+- (void)expandMenuStep1 {
     int tag = 1000 + _flag;
     StoryMenuItem *item = (StoryMenuItem *)[self viewWithTag:tag];
 		
@@ -206,6 +227,7 @@
 		default:
 			break;
 	}
+	
 	rotateAnimation.duration = 2*TIME_OFFSET;	
     CAKeyframeAnimation *positionAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
     positionAnimation.duration = TIME_OFFSET;
@@ -226,6 +248,12 @@
     item.center = item.endPoint;
     
     _flag++;
+}
+
+- (void)expandMenuStep2 {
+}
+
+- (void)expandMenuStep3 {
 }
 
 - (void)closeStoryMenu {
