@@ -6,8 +6,8 @@
 //  Copyright 2012 __MyCompanyName__. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import "StoryMenu.h"
 
-@interface JXCoreAnimationViewController : UIViewController
+@interface JXCoreAnimationViewController : UIViewController <StoryMenuDelegate>
 
 @end

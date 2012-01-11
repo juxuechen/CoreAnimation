@@ -8,6 +8,7 @@
 
 #import "JXCoreAnimationViewController.h"
 
+
 @implementation JXCoreAnimationViewController
 
 - (void)didReceiveMemoryWarning
@@ -21,7 +22,35 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
+	UIImage *backgroundImage = [UIImage imageNamed:@"myItem.png"];
+    
+    NSArray *storyImages = [[NSArray alloc] initWithObjects:
+                            [UIImage imageNamed:@"couponItem.png"],
+                            [UIImage imageNamed:@"favoriteItem.png"],
+                            [UIImage imageNamed:@"nearbyItem.png"],
+                            [UIImage imageNamed:@"waimaiItem.png"],
+                            [UIImage imageNamed:@"tuanItem.png"], nil];
+    
+    NSMutableArray *storyMenusArray = [[NSMutableArray alloc]init];
+    for (UIImage *storyImage in storyImages) {
+        StoryMenuItem *menuItem = [StoryMenuItem initWithImage:storyImage
+											  highlightedImage:nil
+											   backgroundImage:backgroundImage
+									highlightedBackgroundImage:nil];
+        [storyMenusArray addObject:menuItem];
+    }
+	
+    StoryMenu *storyMenu = [[StoryMenu alloc] initWithStoryMenus:storyMenusArray];
+    storyMenu.delegate = self;
+    [self.view addSubview:storyMenu];
+	
+	for (UIView *view in storyMenu.subviews){
+		NSLog(@"view %@",view);
+	}
+}
+
+- (void)tappedInStoryMenu:(StoryMenu *)storyMenu didSelectAtIndex:(NSInteger)index {
+    NSLog(@"Select the index : %d",index);
 }
 
 - (void)viewDidUnload

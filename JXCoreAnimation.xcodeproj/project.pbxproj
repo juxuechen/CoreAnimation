@@ -25,6 +25,11 @@
 		8605545514BD31670021B15B /* nearbyItem@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8605544B14BD31670021B15B /* nearbyItem@2x.png */; };
 		8605545614BD31670021B15B /* waimaiItem.png in Resources */ = {isa = PBXBuildFile; fileRef = 8605544C14BD31670021B15B /* waimaiItem.png */; };
 		8605545714BD31670021B15B /* waimaiItem@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8605544D14BD31670021B15B /* waimaiItem@2x.png */; };
+		8605546814BD37900021B15B /* StoryMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 8605546714BD37900021B15B /* StoryMenu.m */; };
+		8605546B14BD37B00021B15B /* StoryMenuItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 8605546A14BD37B00021B15B /* StoryMenuItem.m */; };
+		8605546D14BD38670021B15B /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8605546C14BD38670021B15B /* QuartzCore.framework */; };
+		8605547014BD390F0021B15B /* tuanItem.png in Resources */ = {isa = PBXBuildFile; fileRef = 8605546E14BD390F0021B15B /* tuanItem.png */; };
+		8605547114BD390F0021B15B /* tuanItem@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8605546F14BD390F0021B15B /* tuanItem@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -51,6 +56,13 @@
 		8605544B14BD31670021B15B /* nearbyItem@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "nearbyItem@2x.png"; sourceTree = SOURCE_ROOT; };
 		8605544C14BD31670021B15B /* waimaiItem.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = waimaiItem.png; sourceTree = SOURCE_ROOT; };
 		8605544D14BD31670021B15B /* waimaiItem@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "waimaiItem@2x.png"; sourceTree = SOURCE_ROOT; };
+		8605546614BD37900021B15B /* StoryMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StoryMenu.h; path = ../StoryMenu.h; sourceTree = "<group>"; };
+		8605546714BD37900021B15B /* StoryMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StoryMenu.m; path = ../StoryMenu.m; sourceTree = "<group>"; };
+		8605546914BD37B00021B15B /* StoryMenuItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StoryMenuItem.h; path = ../StoryMenuItem.h; sourceTree = "<group>"; };
+		8605546A14BD37B00021B15B /* StoryMenuItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StoryMenuItem.m; path = ../StoryMenuItem.m; sourceTree = "<group>"; };
+		8605546C14BD38670021B15B /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		8605546E14BD390F0021B15B /* tuanItem.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tuanItem.png; sourceTree = SOURCE_ROOT; };
+		8605546F14BD390F0021B15B /* tuanItem@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "tuanItem@2x.png"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +70,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8605546D14BD38670021B15B /* QuartzCore.framework in Frameworks */,
 				8605542714BD2FDE0021B15B /* UIKit.framework in Frameworks */,
 				8605542914BD2FDE0021B15B /* Foundation.framework in Frameworks */,
 				8605542B14BD2FDE0021B15B /* CoreGraphics.framework in Frameworks */,
@@ -88,6 +101,7 @@
 		8605542514BD2FDE0021B15B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				8605546C14BD38670021B15B /* QuartzCore.framework */,
 				8605542614BD2FDE0021B15B /* UIKit.framework */,
 				8605542814BD2FDE0021B15B /* Foundation.framework */,
 				8605542A14BD2FDE0021B15B /* CoreGraphics.framework */,
@@ -103,6 +117,10 @@
 				8605543814BD2FDE0021B15B /* JXCoreAnimationViewController.h */,
 				8605543914BD2FDE0021B15B /* JXCoreAnimationViewController.m */,
 				8605543B14BD2FDE0021B15B /* JXCoreAnimationViewController.xib */,
+				8605546614BD37900021B15B /* StoryMenu.h */,
+				8605546714BD37900021B15B /* StoryMenu.m */,
+				8605546914BD37B00021B15B /* StoryMenuItem.h */,
+				8605546A14BD37B00021B15B /* StoryMenuItem.m */,
 				8605542D14BD2FDE0021B15B /* Supporting Files */,
 			);
 			path = JXCoreAnimation;
@@ -122,6 +140,8 @@
 		8605544314BD31520021B15B /* image */ = {
 			isa = PBXGroup;
 			children = (
+				8605546E14BD390F0021B15B /* tuanItem.png */,
+				8605546F14BD390F0021B15B /* tuanItem@2x.png */,
 				8605544414BD31670021B15B /* couponItem.png */,
 				8605544514BD31670021B15B /* couponItem@2x.png */,
 				8605544614BD31670021B15B /* favoriteItem.png */,
@@ -199,6 +219,8 @@
 				8605545514BD31670021B15B /* nearbyItem@2x.png in Resources */,
 				8605545614BD31670021B15B /* waimaiItem.png in Resources */,
 				8605545714BD31670021B15B /* waimaiItem@2x.png in Resources */,
+				8605547014BD390F0021B15B /* tuanItem.png in Resources */,
+				8605547114BD390F0021B15B /* tuanItem@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -212,6 +234,8 @@
 				8605543314BD2FDE0021B15B /* main.m in Sources */,
 				8605543714BD2FDE0021B15B /* JXCoreAnimationAppDelegate.m in Sources */,
 				8605543A14BD2FDE0021B15B /* JXCoreAnimationViewController.m in Sources */,
+				8605546814BD37900021B15B /* StoryMenu.m in Sources */,
+				8605546B14BD37B00021B15B /* StoryMenuItem.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
