@@ -20,6 +20,7 @@
     NSTimer *_timer;
     NSArray *_storyMenus;
     StoryMenuItem *_storyMenu;
+	int step;
 }
 
 @property (nonatomic, copy) NSArray *storyMenus;

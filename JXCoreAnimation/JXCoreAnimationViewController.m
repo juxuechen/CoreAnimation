@@ -8,7 +8,6 @@
 
 #import "JXCoreAnimationViewController.h"
 
-
 @implementation JXCoreAnimationViewController
 
 - (void)didReceiveMemoryWarning
@@ -26,8 +25,6 @@
     
     NSArray *storyImages = [[NSArray alloc] initWithObjects:
                             [UIImage imageNamed:@"couponItem.png"],
-                            [UIImage imageNamed:@"favoriteItem.png"],
-                            [UIImage imageNamed:@"nearbyItem.png"],
                             [UIImage imageNamed:@"waimaiItem.png"],
                             [UIImage imageNamed:@"tuanItem.png"], nil];
     
@@ -43,10 +40,7 @@
     StoryMenu *storyMenu = [[StoryMenu alloc] initWithStoryMenus:storyMenusArray];
     storyMenu.delegate = self;
     [self.view addSubview:storyMenu];
-	
-	for (UIView *view in storyMenu.subviews){
-		NSLog(@"view %@",view);
-	}
+
 }
 
 - (void)tappedInStoryMenu:(StoryMenu *)storyMenu didSelectAtIndex:(NSInteger)index {

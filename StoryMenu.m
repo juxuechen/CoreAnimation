@@ -9,12 +9,13 @@
 #import "StoryMenu.h"
 #import <QuartzCore/QuartzCore.h>
 
-#define TIME_OFFSET 0.05f
-#define END_X  32.0f
+#define TIME_OFFSET 1.5f
+#define BEN_Y  40.0f
+#define END_X  50.0f
 #define END_Y  150.0f
-#define NEA_Y  130.0f
-#define FAR_Y  170.0f
-#define STORY_MENU_CENTER_POINT CGPointMake(160, 40)
+#define NEA_Y  100.0f
+#define FAR_Y  200.0f
+#define STORY_MENU_CENTER_POINT CGPointMake(280, 420)
 
 @interface StoryMenu ()
 
@@ -38,9 +39,11 @@
 @synthesize storyMenus = _storyMenus;
 
 - (id)initWithStoryMenus:(NSArray *)aStoryMenus {
-    if ((self = [super initWithFrame:CGRectMake(0, 0, 320, 200)])) {
+    if ((self = [super initWithFrame:CGRectMake(0, 0, 320, 480)])) {
         self.backgroundColor = [UIColor clearColor];
         
+		step = 1;
+		
         _storyMenus = [aStoryMenus copy];
         
         // add the menu item
@@ -54,6 +57,7 @@
         self.storyMenu.delegate = self;
         self.storyMenu.center = STORY_MENU_CENTER_POINT;
         [self addSubview:_storyMenu];
+		
     }
     return self;
 }
@@ -64,7 +68,7 @@
     for (int i = 0; i < count; i ++) {
         StoryMenuItem *item = [_storyMenus objectAtIndex:i];
         item.tag = 1000 + i;
-        item.startPoint = STORY_MENU_CENTER_POINT;
+        item.startPoint = CGPointMake(END_X*(i*2+1), BEN_Y);//STORY_MENU_CENTER_POINT;
         item.endPoint = CGPointMake(END_X*(i*2+1), END_Y);
         item.nearPoint = CGPointMake(END_X*(i*2+1), NEA_Y);
         item.farPoint = CGPointMake(END_X*(i*2+1), FAR_Y);
@@ -131,10 +135,10 @@
     
     // rotate "add" button
     float angle = self.isExpanding ? -M_PI_4 : 0.0f;
-    [UIView animateWithDuration:0.2f animations:^{
+    [UIView animateWithDuration:0.5f animations:^{
         _storyMenu.transform = CGAffineTransformMakeRotation(angle);
     }];
-    
+	
     if ([delegate respondsToSelector:@selector(tappedInStoryMenu:didSelectAtIndex:)]) {
         [delegate tappedInStoryMenu:self didSelectAtIndex:item.tag - 1000];
     }
@@ -148,21 +152,21 @@
     _expanding = expanding;    
     
     // rotate add button
-    float angle = self.isExpanding ? -M_PI_4 : 0.0f;
+    float angle = self.isExpanding ? -M_PI : 0.0f;
     [UIView animateWithDuration:0.2f animations:^{
         _storyMenu.transform = CGAffineTransformMakeRotation(angle);
     }];
     
     // expand or close animation
     if (!_timer) {
-        _flag = self.isExpanding ? 0 : 5;
+        _flag = self.isExpanding ? 0 : 2;
         SEL selector = self.isExpanding ? @selector(expandStoryMenu) : @selector(closeStoryMenu);
         _timer = [NSTimer scheduledTimerWithTimeInterval:TIME_OFFSET target:self selector:selector userInfo:nil repeats:YES];
     }
 }
 
 - (void)expandStoryMenu {
-    if (_flag == 6) {
+    if (_flag == 3) {
         [_timer invalidate];
         
         _timer = nil;
@@ -171,16 +175,40 @@
     
     int tag = 1000 + _flag;
     StoryMenuItem *item = (StoryMenuItem *)[self viewWithTag:tag];
-    
-    CAKeyframeAnimation *rotateAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation.z"];
-    rotateAnimation.values = [NSArray arrayWithObjects:[NSNumber numberWithFloat:M_PI],[NSNumber numberWithFloat:0.0f], nil];
-    rotateAnimation.duration = 0.5f;
-    rotateAnimation.keyTimes = [NSArray arrayWithObjects:
-                                [NSNumber numberWithFloat:.3], 
-                                [NSNumber numberWithFloat:.4], nil]; 
-    
+		
+	CAKeyframeAnimation *rotateAnimation;
+	switch (_flag) {
+		case 0:
+			rotateAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation.x"];
+			rotateAnimation.values = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0f],
+									  [NSNumber numberWithFloat:M_PI*3/4],
+									  [NSNumber numberWithFloat:-M_PI*3/4],
+									  [NSNumber numberWithFloat:0.0f],nil];
+			rotateAnimation.keyTimes = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.2f],
+										[NSNumber numberWithFloat:0.5f],
+										[NSNumber numberWithFloat:0.8f],
+										[NSNumber numberWithFloat:1.0f],nil];
+			break;
+		case 1:
+			rotateAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation.y"];
+			rotateAnimation.values = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0f],
+									  [NSNumber numberWithFloat:M_PI*3/4],
+									  [NSNumber numberWithFloat:-M_PI*3/4],
+									  [NSNumber numberWithFloat:0.0f],nil];
+			break;
+		case 2:
+			rotateAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation.z"];
+			rotateAnimation.values = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0f],
+									  [NSNumber numberWithFloat:M_PI*7/4],
+									  [NSNumber numberWithFloat:-M_PI*7/4],
+									  [NSNumber numberWithFloat:0.0f],nil];
+			break;
+		default:
+			break;
+	}
+	rotateAnimation.duration = 2*TIME_OFFSET;	
     CAKeyframeAnimation *positionAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
-    positionAnimation.duration = 0.5f;
+    positionAnimation.duration = TIME_OFFSET;
     CGMutablePathRef path = CGPathCreateMutable();
     CGPathMoveToPoint(path, NULL, item.startPoint.x, item.startPoint.y);
     CGPathAddLineToPoint(path, NULL, item.farPoint.x, item.farPoint.y);
@@ -191,7 +219,7 @@
     
     CAAnimationGroup *animationgroup = [CAAnimationGroup animation];
     animationgroup.animations = [NSArray arrayWithObjects:positionAnimation, rotateAnimation, nil];
-    animationgroup.duration = 0.5f;
+    animationgroup.duration = 2*TIME_OFFSET;
     animationgroup.fillMode = kCAFillModeForwards;
     animationgroup.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
     [item.layer addAnimation:animationgroup forKey:@"Expand"];
