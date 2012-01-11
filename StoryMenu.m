@@ -173,12 +173,12 @@
 			[self expandMenuStep1];
 			break;
 		case 2:
-			[self expandMenuStep1];
+			[self expandMenuStep2];
 			break;
+//		case 3:
+//			[self expandMenuStep1];
+//			break;
 		case 3:
-			[self expandMenuStep1];
-			break;
-		case 4:
 			[_timer invalidate];
 			_timer = nil;
 			step = 0;
@@ -227,8 +227,8 @@
 		default:
 			break;
 	}
+	rotateAnimation.duration = 2*TIME_OFFSET;
 	
-	rotateAnimation.duration = 2*TIME_OFFSET;	
     CAKeyframeAnimation *positionAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
     positionAnimation.duration = TIME_OFFSET;
     CGMutablePathRef path = CGPathCreateMutable();
@@ -251,6 +251,42 @@
 }
 
 - (void)expandMenuStep2 {
+	int count = [_storyMenus count];
+    for (int i = 0; i < count; i ++) {
+        StoryMenuItem *item = [_storyMenus objectAtIndex:i];
+        item.tag = 1000 + i;
+        item.startPoint = item.center;
+        item.endPoint = CGPointMake(END_X*(i*2+1), 2*END_Y);
+        item.nearPoint = CGPointMake(END_X*(i*2+1), 2*NEA_Y);
+        item.farPoint = CGPointMake(END_X*(i*2+1), 2*FAR_Y);
+        item.delegate = self;
+        [self addSubview:item];
+    }
+	
+	int tag = 1000 + _flag;
+    StoryMenuItem *item = (StoryMenuItem *)[self viewWithTag:tag];
+	
+	CAKeyframeAnimation *positionAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
+    positionAnimation.duration = 2*TIME_OFFSET;
+    CGMutablePathRef path = CGPathCreateMutable();
+    CGPathMoveToPoint(path, NULL, item.startPoint.x, item.startPoint.y);
+    CGPathAddArcToPoint(path, NULL, 
+						item.startPoint.x-100, item.startPoint.y+100,
+						item.startPoint.x-100, item.startPoint.y+150,
+						M_PI);
+    CGPathAddLineToPoint(path, NULL, item.endPoint.x, item.endPoint.y);
+    positionAnimation.path = path;
+    CGPathRelease(path);
+    
+    CAAnimationGroup *animationgroup = [CAAnimationGroup animation];
+    animationgroup.animations = [NSArray arrayWithObjects:positionAnimation, nil];
+    animationgroup.duration = 2*TIME_OFFSET;
+    animationgroup.fillMode = kCAFillModeForwards;
+    animationgroup.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
+    [item.layer addAnimation:animationgroup forKey:@"Expand"];
+    item.center = item.endPoint;
+    
+    _flag++;
 }
 
 - (void)expandMenuStep3 {
