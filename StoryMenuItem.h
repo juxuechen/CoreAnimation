@@ -18,14 +18,10 @@
     UIImageView *_contentImageView;
     CGPoint _startPoint;
     CGPoint _endPoint;
-    CGPoint _nearPoint; // near
-    CGPoint _farPoint; // far
 }
 
 @property (nonatomic) CGPoint startPoint;
 @property (nonatomic) CGPoint endPoint;
-@property (nonatomic) CGPoint nearPoint;
-@property (nonatomic) CGPoint farPoint;
 @property (nonatomic, assign) id<StoryMenuItemDelegate> delegate;
 
 + (id)initWithImage:(UIImage *)image highlightedImage:(UIImage *)highlightedImage backgroundImage:(UIImage *)backgroundImage highlightedBackgroundImage:(UIImage *)highlightedBackgroundImage;

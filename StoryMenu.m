@@ -9,12 +9,11 @@
 #import "StoryMenu.h"
 #import <QuartzCore/QuartzCore.h>
 
-#define TIME_OFFSET 1.5f
+#define TIME_OFFSET 0.1f
+#define ANIMATIONTIME 4.0f
 #define BEN_Y  40.0f
 #define END_X  50.0f
 #define END_Y  150.0f
-#define NEA_Y  100.0f
-#define FAR_Y  200.0f
 #define STORY_MENU_CENTER_POINT CGPointMake(280, 420)
 
 @interface StoryMenu ()
@@ -73,8 +72,6 @@
         item.tag = 1000 + i;
         item.startPoint = CGPointMake(END_X*(i*2+1), BEN_Y);//STORY_MENU_CENTER_POINT;
         item.endPoint = CGPointMake(END_X*(i*2+1), END_Y);
-        item.nearPoint = CGPointMake(END_X*(i*2+1), NEA_Y);
-        item.farPoint = CGPointMake(END_X*(i*2+1), FAR_Y);
         item.center = item.startPoint;
         item.delegate = self;
         [self addSubview:item];
@@ -156,6 +153,7 @@
     
     if (!_timer) {
         _flag = self.isExpanding ? 0 : 2;
+		step = 1;
         SEL selector = self.isExpanding ? @selector(startMenuAnimation) : @selector(closeStoryMenu);
         _timer = [NSTimer scheduledTimerWithTimeInterval:TIME_OFFSET target:self selector:selector userInfo:nil repeats:YES];
     }
@@ -181,13 +179,13 @@
 		case 3:
 			[_timer invalidate];
 			_timer = nil;
-			step = 0;
+			step = 1;
 			break;
 		default:
 			break;
 	}
 	
-	float angle = self.isExpanding ? -M_PI_2*step : 0.0f;
+	float angle = self.isExpanding ? -M_PI_2*(step-1): 0.0f;
 	[UIView animateWithDuration:0.2f animations:^{
 		_storyMenu.transform = CGAffineTransformMakeRotation(angle);
 	}];
@@ -235,21 +233,22 @@
 		default:
 			break;
 	}
-	rotateAnimation.duration = 2*TIME_OFFSET;
+	rotateAnimation.duration = ANIMATIONTIME;
 	
+	float offsetY = 100.0f;
     CAKeyframeAnimation *positionAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
-    positionAnimation.duration = TIME_OFFSET;
+    positionAnimation.duration = ANIMATIONTIME;
     CGMutablePathRef path = CGPathCreateMutable();
     CGPathMoveToPoint(path, NULL, item.startPoint.x, item.startPoint.y);
-    CGPathAddLineToPoint(path, NULL, item.farPoint.x, item.farPoint.y);
-    CGPathAddLineToPoint(path, NULL, item.nearPoint.x, item.nearPoint.y);
+    CGPathAddLineToPoint(path, NULL, item.startPoint.x, END_Y+offsetY/2.0f);
+    CGPathAddLineToPoint(path, NULL, item.startPoint.x, END_Y+offsetY);
     CGPathAddLineToPoint(path, NULL, item.endPoint.x, item.endPoint.y);
     positionAnimation.path = path;
     CGPathRelease(path);
     
     CAAnimationGroup *animationgroup = [CAAnimationGroup animation];
     animationgroup.animations = [NSArray arrayWithObjects:positionAnimation, rotateAnimation, nil];
-    animationgroup.duration = 2*TIME_OFFSET;
+    animationgroup.duration = ANIMATIONTIME;
     animationgroup.fillMode = kCAFillModeForwards;
     animationgroup.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
     [item.layer addAnimation:animationgroup forKey:@"Expand"];
@@ -262,20 +261,76 @@
 	int tag = 1000 + _flag;
     StoryMenuItem *item = (StoryMenuItem *)[self viewWithTag:tag];
 	
+	float radius = 90.0f;
+	float len = 50.0f;
 	CAKeyframeAnimation *positionAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
-    positionAnimation.duration = TIME_OFFSET;
+    positionAnimation.duration = ANIMATIONTIME;
     CGMutablePathRef path = CGPathCreateMutable();
     CGPathMoveToPoint(path, NULL, item.center.x, item.center.y);
-	CGPathAddCurveToPoint(path, nil,item.center.x-200, item.center.y,item.center.x-200,item.center.y+240, item.center.x, item.center.y+240);
-	CGPathAddCurveToPoint(path, nil,item.center.x+200, item.center.y+240,item.center.x+200,item.center.y, item.center.x, item.center.y);
+	switch (_flag) {
+		case 0:
+			CGPathAddCurveToPoint(path, nil,
+								  item.center.x-len, item.center.y-len,
+								  item.center.x+len*3, item.center.y+len*4, 
+								  item.center.x+len*4, item.center.y+len*3);
+			CGPathAddCurveToPoint(path, nil,
+								  item.center.x+len*5, item.center.y+len*2,
+								  item.center.x+len, item.center.y-len, 
+								  item.center.x, item.center.y);
+			break;
+		case 1:
+			//1
+			CGPathAddCurveToPoint(path, nil,
+								  item.center.x-radius, item.center.y,
+								  item.center.x-radius, item.center.y+radius, 
+								  item.center.x, item.center.y+radius);
+			//2
+			CGPathAddCurveToPoint(path, nil,
+								  item.center.x+radius, item.center.y+radius,
+								  item.center.x+radius, item.center.y+radius*2, 
+								  item.center.x, item.center.y+radius*2);
+			//3
+			CGPathAddCurveToPoint(path, nil,
+								  item.center.x-radius*2, item.center.y+radius*2,
+								  item.center.x-radius*2, item.center.y+radius*3, 
+								  item.center.x-radius, item.center.y+radius*3);
+			//4
+			CGPathAddCurveToPoint(path, nil,
+								  item.center.x+radius, item.center.y+radius*3,
+								  item.center.x+radius, item.center.y+radius*2, 
+								  item.center.x, item.center.y+radius*2);
+			//5
+			CGPathAddCurveToPoint(path, nil,
+								  item.center.x-radius, item.center.y+radius*2,
+								  item.center.x-radius, item.center.y+radius, 
+								  item.center.x, item.center.y+radius);
+			//6
+			CGPathAddCurveToPoint(path, nil,
+								  item.center.x+radius, item.center.y+radius,
+								  item.center.x+radius, item.center.y, 
+								  item.center.x, item.center.y);
+			break;
+		case 2:
+			CGPathAddCurveToPoint(path, nil,
+								  item.center.x+len, item.center.y-len,
+								  item.center.x-len*3, item.center.y+len*4, 
+								  item.center.x-len*4, item.center.y+len*3);
+			CGPathAddCurveToPoint(path, nil,
+								  item.center.x-len*5, item.center.y+len*2,
+								  item.center.x-len, item.center.y-len, 
+								  item.center.x, item.center.y);
+			break;
+		default:
+			break;
+	}
     positionAnimation.path = path;
     CGPathRelease(path);
     
     CAAnimationGroup *animationgroup = [CAAnimationGroup animation];
     animationgroup.animations = [NSArray arrayWithObjects:positionAnimation, nil];
-    animationgroup.duration = 2*TIME_OFFSET;
+    animationgroup.duration = ANIMATIONTIME;
     animationgroup.fillMode = kCAFillModeForwards;
-    animationgroup.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionDefault];
+    animationgroup.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
     [item.layer addAnimation:animationgroup forKey:@"Expand"];
     
     _flag++;
@@ -307,7 +362,6 @@
     positionAnimation.duration = 0.5f;
     CGMutablePathRef path = CGPathCreateMutable();
     CGPathMoveToPoint(path, NULL, item.endPoint.x, item.endPoint.y);
-    CGPathAddLineToPoint(path, NULL, item.farPoint.x, item.farPoint.y);
     CGPathAddLineToPoint(path, NULL, item.startPoint.x, item.startPoint.y);
     positionAnimation.path = path;
     CGPathRelease(path);
