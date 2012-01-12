@@ -202,17 +202,23 @@
 		case 0:
 			rotateAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation.x"];
 			rotateAnimation.values = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0f],
+									  [NSNumber numberWithFloat:M_PI*2],
+									  [NSNumber numberWithFloat:-M_PI*2],
 									  [NSNumber numberWithFloat:M_PI*7/4],
 									  [NSNumber numberWithFloat:-M_PI*7/4],
 									  [NSNumber numberWithFloat:0.0f],nil];
 			rotateAnimation.keyTimes = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.2f],
 										[NSNumber numberWithFloat:0.5f],
+										[NSNumber numberWithFloat:0.7f],
 										[NSNumber numberWithFloat:0.8f],
+										[NSNumber numberWithFloat:0.9f],
 										[NSNumber numberWithFloat:1.0f],nil];
 			break;
 		case 1:
 			rotateAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation.y"];
 			rotateAnimation.values = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0f],
+									  [NSNumber numberWithFloat:M_PI*2],
+									  [NSNumber numberWithFloat:-M_PI*2],
 									  [NSNumber numberWithFloat:M_PI*7/4],
 									  [NSNumber numberWithFloat:-M_PI*7/4],
 									  [NSNumber numberWithFloat:0.0f],nil];
@@ -220,6 +226,8 @@
 		case 2:
 			rotateAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation.z"];
 			rotateAnimation.values = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0f],
+									  [NSNumber numberWithFloat:M_PI*2],
+									  [NSNumber numberWithFloat:-M_PI*2],
 									  [NSNumber numberWithFloat:M_PI*7/4],
 									  [NSNumber numberWithFloat:-M_PI*7/4],
 									  [NSNumber numberWithFloat:0.0f],nil];
@@ -243,7 +251,7 @@
     animationgroup.animations = [NSArray arrayWithObjects:positionAnimation, rotateAnimation, nil];
     animationgroup.duration = 2*TIME_OFFSET;
     animationgroup.fillMode = kCAFillModeForwards;
-    animationgroup.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    animationgroup.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
     [item.layer addAnimation:animationgroup forKey:@"Expand"];
     item.center = item.endPoint;
     
