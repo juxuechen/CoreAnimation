@@ -16,6 +16,7 @@
 
 
 @interface StoryMenu : UIView <StoryMenuItemDelegate> {
+	NSTimer *_time;
     int _flag;
     NSArray *_storyMenus;
     StoryMenuItem *_storyMenu;

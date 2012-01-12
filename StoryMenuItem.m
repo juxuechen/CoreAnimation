@@ -18,6 +18,7 @@ static inline CGRect ScaleRect(CGRect rect, float n) {
 @synthesize startPoint = _startPoint;
 @synthesize endPoint = _endPoint;
 
+
 + (id)initWithImage:(UIImage *)image highlightedImage:(UIImage *)highlightedImage backgroundImage:(UIImage *)backgroundImage highlightedBackgroundImage:(UIImage *)highlightedBackgroundImage {
     StoryMenuItem *item = [[[self class] alloc] initWithImage:image highlightedImage:highlightedImage backgroundImage:backgroundImage highlightedBackgroundImage:highlightedBackgroundImage];
     return item;

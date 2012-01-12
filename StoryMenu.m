@@ -10,7 +10,7 @@
 #import <QuartzCore/QuartzCore.h>
 
 #define TIME_OFFSET 0.1f
-#define ANIMATIONTIME 4.0f
+#define ANIMATIONTIME 2.0f
 #define BEN_Y  40.0f
 #define END_X  52.0f
 #define END_Y  150.0f
@@ -38,6 +38,11 @@
 @synthesize expanding = _expanding;
 @synthesize storyMenu = _storyMenu;
 @synthesize storyMenus = _storyMenus;
+
+- (void)stoptime {
+	[_time invalidate];
+	_time = nil;
+}
 
 - (id)initWithStoryMenus:(NSArray *)aStoryMenus {
     if ((self = [super initWithFrame:CGRectMake(0, 0, 320, 480)])) {
@@ -82,7 +87,7 @@
        
         _storyMenus = [aStoryMenus copy];
         
-        // clean subviews
+
         for (UIView *menu in self.subviews) {
             if (menu.tag >= 1000) {
                 [menu removeFromSuperview];
@@ -123,19 +128,18 @@
     // shrink other menu buttons
     for (int i = 0; i < [_storyMenus count]; i ++) {
         StoryMenuItem *otherItem = [_storyMenus objectAtIndex:i];
-        CAAnimationGroup *shrink = [self shrinkAnimationAtPoint:otherItem.center];
-        if (otherItem.tag == item.tag) {
+		if (otherItem.tag == item.tag) {
             continue;
         }
+        CAAnimationGroup *shrink = [self shrinkAnimationAtPoint:otherItem.center];
         [otherItem.layer addAnimation:shrink forKey:@"shrink"];
         otherItem.center = otherItem.startPoint;
     }
     _expanding = NO;
     
-    // rotate "add" button
-    float angle = self.isExpanding ? -M_PI_4 : 0.0f;
+	
     [UIView animateWithDuration:0.5f animations:^{
-        _storyMenu.transform = CGAffineTransformMakeRotation(angle);
+        _storyMenu.transform = CGAffineTransformMakeRotation(0.0f);
     }];
 	
     if ([delegate respondsToSelector:@selector(tappedInStoryMenu:didSelectAtIndex:)]) {
@@ -150,22 +154,26 @@
 - (void)setExpanding:(BOOL)expanding {
     _expanding = expanding;    
     
-    _flag = self.isExpanding ? 0 : 2;
-	step = 1;
-	SEL selector = self.isExpanding ? @selector(startMenuAnimation) : @selector(closeStoryMenu);
-	[self performSelector:selector];
+	if (!_time) {
+		_flag = self.isExpanding ? 0 : 2;
+		step = 1;
+		SEL selector = self.isExpanding ? @selector(startMenuAnimation) : @selector(closeStoryMenu);
+		[self performSelector:selector];
+	}	
 }
 
 - (void)startMenuAnimation {
-	SEL selector = @selector(startMenuAnimation);
 	switch (step) {
 		case 1:
-			[NSTimer scheduledTimerWithTimeInterval:ANIMATIONTIME+TIME_OFFSET target:self selector:selector userInfo:nil repeats:NO];
+			_time = [NSTimer scheduledTimerWithTimeInterval:ANIMATIONTIME 
+													 target:self selector:@selector(startMenuAnimation) userInfo:nil repeats:NO];
 			[self expandMenuStep1];
 			_flag = 0;
 			step++;
 			break;
 		case 2:
+			_time = [NSTimer scheduledTimerWithTimeInterval:ANIMATIONTIME 
+													 target:self selector:@selector(stoptime) userInfo:nil repeats:NO];
 			[self expandMenuStep2];
 			_flag = 0;
 			step++;
@@ -323,7 +331,8 @@
 	[UIView animateWithDuration:0.2f animations:^{
 		_storyMenu.transform = CGAffineTransformMakeRotation(0.0f);
 	}];
-	
+	_time = [NSTimer scheduledTimerWithTimeInterval:ANIMATIONTIME 
+											 target:self selector:@selector(stoptime) userInfo:nil repeats:NO];
 	for (; _flag > -1; _flag--) {
 		StoryMenuItem *item = (StoryMenuItem *)[self viewWithTag:(1000+_flag)];
 		CAKeyframeAnimation *rotateAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation.z"];
@@ -358,14 +367,15 @@
     positionAnimation.keyTimes = [NSArray arrayWithObjects: [NSNumber numberWithFloat:.3], nil]; 
     
     CABasicAnimation *scaleAnimation = [CABasicAnimation animationWithKeyPath:@"transform"];
-    scaleAnimation.toValue = [NSValue valueWithCATransform3D:CATransform3DMakeScale(3, 3, 1)];
+    scaleAnimation.toValue = [NSValue valueWithCATransform3D:CATransform3DMakeScale(5, 5, 1)];
+	scaleAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
     
     CABasicAnimation *opacityAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
     opacityAnimation.toValue  = [NSNumber numberWithFloat:0.0f];
     
     CAAnimationGroup *animationgroup = [CAAnimationGroup animation];
     animationgroup.animations = [NSArray arrayWithObjects:positionAnimation, scaleAnimation, opacityAnimation, nil];
-    animationgroup.duration = 0.3f;
+    animationgroup.duration = ANIMATIONTIME;
     animationgroup.fillMode = kCAFillModeForwards;
     
     return animationgroup;
@@ -378,13 +388,14 @@
     
     CABasicAnimation *scaleAnimation = [CABasicAnimation animationWithKeyPath:@"transform"];
     scaleAnimation.toValue = [NSValue valueWithCATransform3D:CATransform3DMakeScale(.01, .01, 1)];
+	scaleAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
     
     CABasicAnimation *opacityAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
     opacityAnimation.toValue  = [NSNumber numberWithFloat:0.0f];
     
     CAAnimationGroup *animationgroup = [CAAnimationGroup animation];
-    animationgroup.animations = [NSArray arrayWithObjects:positionAnimation, scaleAnimation, opacityAnimation, nil];
-    animationgroup.duration = 0.3f;
+    animationgroup.animations = [NSArray arrayWithObjects: positionAnimation, scaleAnimation, opacityAnimation, nil];
+    animationgroup.duration = ANIMATIONTIME;
     animationgroup.fillMode = kCAFillModeForwards;
     
     return animationgroup;
