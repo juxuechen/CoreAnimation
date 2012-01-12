@@ -133,6 +133,7 @@
         }
         CAAnimationGroup *shrink = [self shrinkAnimationAtPoint:otherItem.center];
         [otherItem.layer addAnimation:shrink forKey:@"shrink"];
+//		otherItem.center = CGPointMake(END_X*(i*2+1), BEN_Y);
     }
 	
 	// apear menu buttons
@@ -410,10 +411,10 @@
 //- (CAAnimationGroup *)appearAnimationAtPoint:(CGPoint)point {
 	for (int i = 0; i < [_storyMenus count]; i++) {
 		StoryMenuItem *item = [_storyMenus objectAtIndex:i];
-		item.center = item.startPoint;
+		item.center = CGPointMake(END_X*(i*2+1), BEN_Y);
 		CAKeyframeAnimation *positionAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
 		positionAnimation.values = [NSArray arrayWithObjects:[NSValue valueWithCGPoint:item.startPoint], nil];
-		positionAnimation.keyTimes = [NSArray arrayWithObjects: [NSNumber numberWithFloat:.3], nil]; 
+		positionAnimation.keyTimes = [NSArray arrayWithObjects: [NSNumber numberWithFloat:.01], nil]; 
 		
 		CABasicAnimation *scaleAnimation = [CABasicAnimation animationWithKeyPath:@"transform"];
 		scaleAnimation.fromValue = [NSValue valueWithCATransform3D:CATransform3DMakeScale(.01, .01, 1)];
