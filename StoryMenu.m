@@ -10,7 +10,7 @@
 #import <QuartzCore/QuartzCore.h>
 
 #define TIME_OFFSET 0.1f
-#define ANIMATIONTIME 2.0f
+#define ANIMATIONTIME 1.5f
 #define BEN_Y  40.0f
 #define END_X  52.0f
 #define END_Y  150.0f
@@ -27,6 +27,7 @@
 - (void)closeStoryMenu;
 - (CAAnimationGroup *)blowupAnimationAtPoint:(CGPoint)point;
 - (CAAnimationGroup *)shrinkAnimationAtPoint:(CGPoint)point;
+- (void)appearStoryMenu;
 
 @end
 
@@ -133,8 +134,11 @@
         }
         CAAnimationGroup *shrink = [self shrinkAnimationAtPoint:otherItem.center];
         [otherItem.layer addAnimation:shrink forKey:@"shrink"];
-        otherItem.center = otherItem.startPoint;
     }
+	
+	// apear menu buttons
+	[self performSelector:@selector(appearStoryMenu) withObject:nil afterDelay:ANIMATIONTIME];
+	
     _expanding = NO;
     
 	
@@ -153,8 +157,10 @@
 
 - (void)setExpanding:(BOOL)expanding {
     _expanding = expanding;    
-    
+    NSLog(@"self.isExpanding %d",self.isExpanding);
+	NSLog(@"_expanding %d",_expanding);
 	if (!_time) {
+		NSLog(@"time nil");
 		_flag = self.isExpanding ? 0 : 2;
 		step = 1;
 		SEL selector = self.isExpanding ? @selector(startMenuAnimation) : @selector(closeStoryMenu);
@@ -331,17 +337,17 @@
 	[UIView animateWithDuration:0.2f animations:^{
 		_storyMenu.transform = CGAffineTransformMakeRotation(0.0f);
 	}];
-	_time = [NSTimer scheduledTimerWithTimeInterval:ANIMATIONTIME 
-											 target:self selector:@selector(stoptime) userInfo:nil repeats:NO];
 	for (; _flag > -1; _flag--) {
 		StoryMenuItem *item = (StoryMenuItem *)[self viewWithTag:(1000+_flag)];
 		CAKeyframeAnimation *rotateAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation.z"];
-		rotateAnimation.values = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0f],[NSNumber numberWithFloat:M_PI * 2],[NSNumber numberWithFloat:0.0f], nil];
+		rotateAnimation.values = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0f],
+								  [NSNumber numberWithFloat:M_PI * 4],
+								  [NSNumber numberWithFloat:0.0f], nil];
 		rotateAnimation.duration = 0.5f;
 		rotateAnimation.keyTimes = [NSArray arrayWithObjects:
 									[NSNumber numberWithFloat:.0],
 									[NSNumber numberWithFloat:.4],
-									[NSNumber numberWithFloat:.5], nil];
+									[NSNumber numberWithFloat:.1], nil];
 		
 		CAKeyframeAnimation *positionAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
 		positionAnimation.duration = 0.5f;
@@ -353,7 +359,7 @@
 		
 		CAAnimationGroup *animationgroup = [CAAnimationGroup animation];
 		animationgroup.animations = [NSArray arrayWithObjects:positionAnimation, rotateAnimation, nil];
-		animationgroup.duration = 0.5f;
+		animationgroup.duration = ANIMATIONTIME/2;
 		animationgroup.fillMode = kCAFillModeForwards;
 		animationgroup.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
 		[item.layer addAnimation:animationgroup forKey:@"Close"];
@@ -401,5 +407,30 @@
     return animationgroup;
 }
 
+- (void)appearStoryMenu{
+//- (CAAnimationGroup *)appearAnimationAtPoint:(CGPoint)point {
+	for (int i = 0; i < [_storyMenus count]; i++) {
+		StoryMenuItem *item = [_storyMenus objectAtIndex:i];
+		item.center = item.startPoint;
+		CAKeyframeAnimation *positionAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
+		positionAnimation.values = [NSArray arrayWithObjects:[NSValue valueWithCGPoint:item.startPoint], nil];
+		positionAnimation.keyTimes = [NSArray arrayWithObjects: [NSNumber numberWithFloat:.3], nil]; 
+		
+		CABasicAnimation *scaleAnimation = [CABasicAnimation animationWithKeyPath:@"transform"];
+		scaleAnimation.fromValue = [NSValue valueWithCATransform3D:CATransform3DMakeScale(.01, .01, 1)];
+		scaleAnimation.toValue = [NSValue valueWithCATransform3D:CATransform3DMakeScale(1, 1, 1)];
+		scaleAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
+		
+		CABasicAnimation *opacityAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+		opacityAnimation.fromValue = [NSNumber numberWithFloat:0.0f];
+		opacityAnimation.toValue  = [NSNumber numberWithFloat:1.0f];
+		
+		CAAnimationGroup *animationgroup = [CAAnimationGroup animation];
+		animationgroup.animations = [NSArray arrayWithObjects: positionAnimation, scaleAnimation, opacityAnimation, nil];
+		animationgroup.duration = ANIMATIONTIME;
+		animationgroup.fillMode = kCAFillModeForwards;
+		[item.layer addAnimation:animationgroup forKey:@"appear"];
+	}
+}
 
 @end
