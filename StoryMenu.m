@@ -9,8 +9,7 @@
 #import "StoryMenu.h"
 #import <QuartzCore/QuartzCore.h>
 
-#define TIME_OFFSET 0.1f
-#define ANIMATIONTIME 1.5f
+#define ANIMATIONTIME 1.7f
 #define BEN_Y  40.0f
 #define END_X  52.0f
 #define END_Y  150.0f
