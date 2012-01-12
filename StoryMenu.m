@@ -12,7 +12,7 @@
 #define TIME_OFFSET 0.1f
 #define ANIMATIONTIME 4.0f
 #define BEN_Y  40.0f
-#define END_X  50.0f
+#define END_X  52.0f
 #define END_Y  150.0f
 #define STORY_MENU_CENTER_POINT CGPointMake(280, 420)
 
@@ -24,7 +24,6 @@
 - (void)startMenuAnimation;
 - (void)expandMenuStep1;
 - (void)expandMenuStep2;
-- (void)expandMenuStep3;
 - (void)closeStoryMenu;
 - (CAAnimationGroup *)blowupAnimationAtPoint:(CGPoint)point;
 - (CAAnimationGroup *)shrinkAnimationAtPoint:(CGPoint)point;
@@ -151,229 +150,206 @@
 - (void)setExpanding:(BOOL)expanding {
     _expanding = expanding;    
     
-    if (!_timer) {
-        _flag = self.isExpanding ? 0 : 2;
-		step = 1;
-        SEL selector = self.isExpanding ? @selector(startMenuAnimation) : @selector(closeStoryMenu);
-        _timer = [NSTimer scheduledTimerWithTimeInterval:TIME_OFFSET target:self selector:selector userInfo:nil repeats:YES];
-    }
+    _flag = self.isExpanding ? 0 : 2;
+	step = 1;
+	SEL selector = self.isExpanding ? @selector(startMenuAnimation) : @selector(closeStoryMenu);
+	[self performSelector:selector];
 }
 
 - (void)startMenuAnimation {
-	if (_flag == 3) {
-        _flag = 0;
-		step += 1;
-        return;
-    }
-
+	SEL selector = @selector(startMenuAnimation);
 	switch (step) {
 		case 1:
+			[NSTimer scheduledTimerWithTimeInterval:ANIMATIONTIME+TIME_OFFSET target:self selector:selector userInfo:nil repeats:NO];
 			[self expandMenuStep1];
+			_flag = 0;
+			step++;
 			break;
 		case 2:
 			[self expandMenuStep2];
-			break;
-//		case 3:
-//			[self expandMenuStep1];
-//			break;
-		case 3:
-			[_timer invalidate];
-			_timer = nil;
-			step = 1;
+			_flag = 0;
+			step++;
 			break;
 		default:
 			break;
 	}
 	
-	float angle = self.isExpanding ? -M_PI_2*(step-1): 0.0f;
 	[UIView animateWithDuration:0.2f animations:^{
-		_storyMenu.transform = CGAffineTransformMakeRotation(angle);
+		_storyMenu.transform = CGAffineTransformMakeRotation(-M_PI_2*(step-1));
 	}];
 }
 
 - (void)expandMenuStep1 {
-    int tag = 1000 + _flag;
-    StoryMenuItem *item = (StoryMenuItem *)[self viewWithTag:tag];
+	for (; _flag < 3; _flag++) {
+		StoryMenuItem *item = (StoryMenuItem *)[self viewWithTag:(1000+_flag)];	
+		CAKeyframeAnimation *rotateAnimation;
+		switch (_flag) {
+			case 0:
+				rotateAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation.x"];
+				rotateAnimation.values = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0f],
+										  [NSNumber numberWithFloat:M_PI*2],
+										  [NSNumber numberWithFloat:-M_PI*2],
+										  [NSNumber numberWithFloat:M_PI*7/4],
+										  [NSNumber numberWithFloat:-M_PI*7/4],
+										  [NSNumber numberWithFloat:0.0f],nil];
+				rotateAnimation.keyTimes = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.2f],
+											[NSNumber numberWithFloat:0.5f],
+											[NSNumber numberWithFloat:0.7f],
+											[NSNumber numberWithFloat:0.8f],
+											[NSNumber numberWithFloat:0.9f],
+											[NSNumber numberWithFloat:1.0f],nil];
+				break;
+			case 1:
+				rotateAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation.y"];
+				rotateAnimation.values = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0f],
+										  [NSNumber numberWithFloat:M_PI*2],
+										  [NSNumber numberWithFloat:-M_PI*2],
+										  [NSNumber numberWithFloat:M_PI*7/4],
+										  [NSNumber numberWithFloat:-M_PI*7/4],
+										  [NSNumber numberWithFloat:0.0f],nil];
+				break;
+			case 2:
+				rotateAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation.z"];
+				rotateAnimation.values = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0f],
+										  [NSNumber numberWithFloat:M_PI*2],
+										  [NSNumber numberWithFloat:-M_PI*2],
+										  [NSNumber numberWithFloat:M_PI*7/4],
+										  [NSNumber numberWithFloat:-M_PI*7/4],
+										  [NSNumber numberWithFloat:0.0f],nil];
+				break;
+			default:
+				break;
+		}
+		rotateAnimation.duration = ANIMATIONTIME;
 		
-	CAKeyframeAnimation *rotateAnimation;
-	switch (_flag) {
-		case 0:
-			rotateAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation.x"];
-			rotateAnimation.values = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0f],
-									  [NSNumber numberWithFloat:M_PI*2],
-									  [NSNumber numberWithFloat:-M_PI*2],
-									  [NSNumber numberWithFloat:M_PI*7/4],
-									  [NSNumber numberWithFloat:-M_PI*7/4],
-									  [NSNumber numberWithFloat:0.0f],nil];
-			rotateAnimation.keyTimes = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.2f],
-										[NSNumber numberWithFloat:0.5f],
-										[NSNumber numberWithFloat:0.7f],
-										[NSNumber numberWithFloat:0.8f],
-										[NSNumber numberWithFloat:0.9f],
-										[NSNumber numberWithFloat:1.0f],nil];
-			break;
-		case 1:
-			rotateAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation.y"];
-			rotateAnimation.values = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0f],
-									  [NSNumber numberWithFloat:M_PI*2],
-									  [NSNumber numberWithFloat:-M_PI*2],
-									  [NSNumber numberWithFloat:M_PI*7/4],
-									  [NSNumber numberWithFloat:-M_PI*7/4],
-									  [NSNumber numberWithFloat:0.0f],nil];
-			break;
-		case 2:
-			rotateAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation.z"];
-			rotateAnimation.values = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0f],
-									  [NSNumber numberWithFloat:M_PI*2],
-									  [NSNumber numberWithFloat:-M_PI*2],
-									  [NSNumber numberWithFloat:M_PI*7/4],
-									  [NSNumber numberWithFloat:-M_PI*7/4],
-									  [NSNumber numberWithFloat:0.0f],nil];
-			break;
-		default:
-			break;
+		float offsetY = 100.0f;
+		CAKeyframeAnimation *positionAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
+		positionAnimation.duration = ANIMATIONTIME;
+		CGMutablePathRef path = CGPathCreateMutable();
+		CGPathMoveToPoint(path, NULL, item.startPoint.x, item.startPoint.y);
+		CGPathAddLineToPoint(path, NULL, item.startPoint.x, END_Y+offsetY);
+		CGPathAddLineToPoint(path, NULL, item.endPoint.x, item.endPoint.y);
+		positionAnimation.path = path;
+		CGPathRelease(path);
+		
+		CAAnimationGroup *animationgroup = [CAAnimationGroup animation];
+		animationgroup.animations = [NSArray arrayWithObjects:positionAnimation, rotateAnimation, nil];
+		animationgroup.duration = ANIMATIONTIME;
+		animationgroup.fillMode = kCAFillModeForwards;
+		animationgroup.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
+		[item.layer addAnimation:animationgroup forKey:@"Expand"];
+		item.center = item.endPoint;
 	}
-	rotateAnimation.duration = ANIMATIONTIME;
-	
-	float offsetY = 100.0f;
-    CAKeyframeAnimation *positionAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
-    positionAnimation.duration = ANIMATIONTIME;
-    CGMutablePathRef path = CGPathCreateMutable();
-    CGPathMoveToPoint(path, NULL, item.startPoint.x, item.startPoint.y);
-    CGPathAddLineToPoint(path, NULL, item.startPoint.x, END_Y+offsetY/2.0f);
-    CGPathAddLineToPoint(path, NULL, item.startPoint.x, END_Y+offsetY);
-    CGPathAddLineToPoint(path, NULL, item.endPoint.x, item.endPoint.y);
-    positionAnimation.path = path;
-    CGPathRelease(path);
-    
-    CAAnimationGroup *animationgroup = [CAAnimationGroup animation];
-    animationgroup.animations = [NSArray arrayWithObjects:positionAnimation, rotateAnimation, nil];
-    animationgroup.duration = ANIMATIONTIME;
-    animationgroup.fillMode = kCAFillModeForwards;
-    animationgroup.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
-    [item.layer addAnimation:animationgroup forKey:@"Expand"];
-    item.center = item.endPoint;
-    
-    _flag++;
 }
 
-- (void)expandMenuStep2 {
-	int tag = 1000 + _flag;
-    StoryMenuItem *item = (StoryMenuItem *)[self viewWithTag:tag];
-	
-	float radius = 90.0f;
-	float len = 50.0f;
-	CAKeyframeAnimation *positionAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
-    positionAnimation.duration = ANIMATIONTIME;
-    CGMutablePathRef path = CGPathCreateMutable();
-    CGPathMoveToPoint(path, NULL, item.center.x, item.center.y);
-	switch (_flag) {
-		case 0:
-			CGPathAddCurveToPoint(path, nil,
-								  item.center.x-len, item.center.y-len,
-								  item.center.x+len*3, item.center.y+len*4, 
-								  item.center.x+len*4, item.center.y+len*3);
-			CGPathAddCurveToPoint(path, nil,
-								  item.center.x+len*5, item.center.y+len*2,
-								  item.center.x+len, item.center.y-len, 
-								  item.center.x, item.center.y);
-			break;
-		case 1:
-			//1
-			CGPathAddCurveToPoint(path, nil,
-								  item.center.x-radius, item.center.y,
-								  item.center.x-radius, item.center.y+radius, 
-								  item.center.x, item.center.y+radius);
-			//2
-			CGPathAddCurveToPoint(path, nil,
-								  item.center.x+radius, item.center.y+radius,
-								  item.center.x+radius, item.center.y+radius*2, 
-								  item.center.x, item.center.y+radius*2);
-			//3
-			CGPathAddCurveToPoint(path, nil,
-								  item.center.x-radius*2, item.center.y+radius*2,
-								  item.center.x-radius*2, item.center.y+radius*3, 
-								  item.center.x-radius, item.center.y+radius*3);
-			//4
-			CGPathAddCurveToPoint(path, nil,
-								  item.center.x+radius, item.center.y+radius*3,
-								  item.center.x+radius, item.center.y+radius*2, 
-								  item.center.x, item.center.y+radius*2);
-			//5
-			CGPathAddCurveToPoint(path, nil,
-								  item.center.x-radius, item.center.y+radius*2,
-								  item.center.x-radius, item.center.y+radius, 
-								  item.center.x, item.center.y+radius);
-			//6
-			CGPathAddCurveToPoint(path, nil,
-								  item.center.x+radius, item.center.y+radius,
-								  item.center.x+radius, item.center.y, 
-								  item.center.x, item.center.y);
-			break;
-		case 2:
-			CGPathAddCurveToPoint(path, nil,
-								  item.center.x+len, item.center.y-len,
-								  item.center.x-len*3, item.center.y+len*4, 
-								  item.center.x-len*4, item.center.y+len*3);
-			CGPathAddCurveToPoint(path, nil,
-								  item.center.x-len*5, item.center.y+len*2,
-								  item.center.x-len, item.center.y-len, 
-								  item.center.x, item.center.y);
-			break;
-		default:
-			break;
-	}
-    positionAnimation.path = path;
-    CGPathRelease(path);
-    
-    CAAnimationGroup *animationgroup = [CAAnimationGroup animation];
-    animationgroup.animations = [NSArray arrayWithObjects:positionAnimation, nil];
-    animationgroup.duration = ANIMATIONTIME;
-    animationgroup.fillMode = kCAFillModeForwards;
-    animationgroup.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-    [item.layer addAnimation:animationgroup forKey:@"Expand"];
-    
-    _flag++;
-}
-
-- (void)expandMenuStep3 {
+- (void)expandMenuStep2 {	
+	for (; _flag < 3; _flag++) {
+		StoryMenuItem *item = (StoryMenuItem *)[self viewWithTag:(1000+_flag)];
+		float radius = 90.0f;
+		float len = 70.0f;
+		CAKeyframeAnimation *positionAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
+		positionAnimation.duration = ANIMATIONTIME;
+		CGMutablePathRef path = CGPathCreateMutable();
+		CGPathMoveToPoint(path, NULL, item.center.x, item.center.y);
+		switch (_flag) {
+			case 0:
+				CGPathAddCurveToPoint(path, nil,
+									  item.center.x-len, item.center.y-len,
+									  item.center.x+len*3, item.center.y+len*4, 
+									  item.center.x+len*4, item.center.y+len*3);
+				CGPathAddCurveToPoint(path, nil,
+									  item.center.x+len*5, item.center.y+len*2,
+									  item.center.x+len, item.center.y-len, 
+									  item.center.x, item.center.y);
+				break;
+			case 1:
+				//1
+				CGPathAddCurveToPoint(path, nil,
+									  item.center.x-radius, item.center.y,
+									  item.center.x-radius, item.center.y+radius, 
+									  item.center.x, item.center.y+radius);
+				//2
+				CGPathAddCurveToPoint(path, nil,
+									  item.center.x+radius, item.center.y+radius,
+									  item.center.x+radius, item.center.y+radius*2, 
+									  item.center.x, item.center.y+radius*2);
+				//3
+				CGPathAddCurveToPoint(path, nil,
+									  item.center.x-radius*2, item.center.y+radius*2,
+									  item.center.x-radius*2, item.center.y+radius*3, 
+									  item.center.x-radius, item.center.y+radius*3);
+				//4
+				CGPathAddCurveToPoint(path, nil,
+									  item.center.x+radius, item.center.y+radius*3,
+									  item.center.x+radius, item.center.y+radius*2, 
+									  item.center.x, item.center.y+radius*2);
+				//5
+				CGPathAddCurveToPoint(path, nil,
+									  item.center.x-radius, item.center.y+radius*2,
+									  item.center.x-radius, item.center.y+radius, 
+									  item.center.x, item.center.y+radius);
+				//6
+				CGPathAddCurveToPoint(path, nil,
+									  item.center.x+radius, item.center.y+radius,
+									  item.center.x+radius, item.center.y, 
+									  item.center.x, item.center.y);
+				break;
+			case 2:
+				CGPathAddCurveToPoint(path, nil,
+									  item.center.x+len, item.center.y-len,
+									  item.center.x-len*3, item.center.y+len*4, 
+									  item.center.x-len*4, item.center.y+len*3);
+				CGPathAddCurveToPoint(path, nil,
+									  item.center.x-len*5, item.center.y+len*2,
+									  item.center.x-len, item.center.y-len, 
+									  item.center.x, item.center.y);
+				break;
+			default:
+				break;
+		}
+		positionAnimation.path = path;
+		CGPathRelease(path);
+		
+		CAAnimationGroup *animationgroup = [CAAnimationGroup animation];
+		animationgroup.animations = [NSArray arrayWithObjects:positionAnimation, nil];
+		animationgroup.duration = ANIMATIONTIME;
+		animationgroup.fillMode = kCAFillModeForwards;
+		animationgroup.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+		[item.layer addAnimation:animationgroup forKey:@"Expand"];
+    }
 }
 
 - (void)closeStoryMenu {
-    if (_flag == -1) {
-        [_timer invalidate];
-       
-        _timer = nil;
-        return;
-    }
-    
-    int tag = 1000 + _flag;
-    StoryMenuItem *item = (StoryMenuItem *)[self viewWithTag:tag];
-    
-    CAKeyframeAnimation *rotateAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation.z"];
-    rotateAnimation.values = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0f],[NSNumber numberWithFloat:M_PI * 2],[NSNumber numberWithFloat:0.0f], nil];
-    rotateAnimation.duration = 0.5f;
-    rotateAnimation.keyTimes = [NSArray arrayWithObjects:
-                                [NSNumber numberWithFloat:.0],
-                                [NSNumber numberWithFloat:.4],
-                                [NSNumber numberWithFloat:.5], nil];
-    
-    CAKeyframeAnimation *positionAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
-    positionAnimation.duration = 0.5f;
-    CGMutablePathRef path = CGPathCreateMutable();
-    CGPathMoveToPoint(path, NULL, item.endPoint.x, item.endPoint.y);
-    CGPathAddLineToPoint(path, NULL, item.startPoint.x, item.startPoint.y);
-    positionAnimation.path = path;
-    CGPathRelease(path);
-    
-    CAAnimationGroup *animationgroup = [CAAnimationGroup animation];
-    animationgroup.animations = [NSArray arrayWithObjects:positionAnimation, rotateAnimation, nil];
-    animationgroup.duration = 0.5f;
-    animationgroup.fillMode = kCAFillModeForwards;
-    animationgroup.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
-    [item.layer addAnimation:animationgroup forKey:@"Close"];
-    item.center = item.startPoint;
-    _flag--;
+	[UIView animateWithDuration:0.2f animations:^{
+		_storyMenu.transform = CGAffineTransformMakeRotation(0.0f);
+	}];
+	
+	for (; _flag > -1; _flag--) {
+		StoryMenuItem *item = (StoryMenuItem *)[self viewWithTag:(1000+_flag)];
+		CAKeyframeAnimation *rotateAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation.z"];
+		rotateAnimation.values = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0f],[NSNumber numberWithFloat:M_PI * 2],[NSNumber numberWithFloat:0.0f], nil];
+		rotateAnimation.duration = 0.5f;
+		rotateAnimation.keyTimes = [NSArray arrayWithObjects:
+									[NSNumber numberWithFloat:.0],
+									[NSNumber numberWithFloat:.4],
+									[NSNumber numberWithFloat:.5], nil];
+		
+		CAKeyframeAnimation *positionAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
+		positionAnimation.duration = 0.5f;
+		CGMutablePathRef path = CGPathCreateMutable();
+		CGPathMoveToPoint(path, NULL, item.endPoint.x, item.endPoint.y);
+		CGPathAddLineToPoint(path, NULL, item.startPoint.x, item.startPoint.y);
+		positionAnimation.path = path;
+		CGPathRelease(path);
+		
+		CAAnimationGroup *animationgroup = [CAAnimationGroup animation];
+		animationgroup.animations = [NSArray arrayWithObjects:positionAnimation, rotateAnimation, nil];
+		animationgroup.duration = 0.5f;
+		animationgroup.fillMode = kCAFillModeForwards;
+		animationgroup.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
+		[item.layer addAnimation:animationgroup forKey:@"Close"];
+		item.center = item.startPoint;
+	}
 }
 
 - (CAAnimationGroup *)blowupAnimationAtPoint:(CGPoint)point {
