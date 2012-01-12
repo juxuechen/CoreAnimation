@@ -202,8 +202,8 @@
 		case 0:
 			rotateAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation.x"];
 			rotateAnimation.values = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0f],
-									  [NSNumber numberWithFloat:M_PI*3/4],
-									  [NSNumber numberWithFloat:-M_PI*3/4],
+									  [NSNumber numberWithFloat:M_PI*7/4],
+									  [NSNumber numberWithFloat:-M_PI*7/4],
 									  [NSNumber numberWithFloat:0.0f],nil];
 			rotateAnimation.keyTimes = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.2f],
 										[NSNumber numberWithFloat:0.5f],
@@ -213,8 +213,8 @@
 		case 1:
 			rotateAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.rotation.y"];
 			rotateAnimation.values = [NSArray arrayWithObjects:[NSNumber numberWithFloat:0.0f],
-									  [NSNumber numberWithFloat:M_PI*3/4],
-									  [NSNumber numberWithFloat:-M_PI*3/4],
+									  [NSNumber numberWithFloat:M_PI*7/4],
+									  [NSNumber numberWithFloat:-M_PI*7/4],
 									  [NSNumber numberWithFloat:0.0f],nil];
 			break;
 		case 2:
@@ -243,7 +243,7 @@
     animationgroup.animations = [NSArray arrayWithObjects:positionAnimation, rotateAnimation, nil];
     animationgroup.duration = 2*TIME_OFFSET;
     animationgroup.fillMode = kCAFillModeForwards;
-    animationgroup.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
+    animationgroup.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
     [item.layer addAnimation:animationgroup forKey:@"Expand"];
     item.center = item.endPoint;
     
@@ -251,30 +251,15 @@
 }
 
 - (void)expandMenuStep2 {
-	int count = [_storyMenus count];
-    for (int i = 0; i < count; i ++) {
-        StoryMenuItem *item = [_storyMenus objectAtIndex:i];
-        item.tag = 1000 + i;
-        item.startPoint = item.center;
-        item.endPoint = CGPointMake(END_X*(i*2+1), 2*END_Y);
-        item.nearPoint = CGPointMake(END_X*(i*2+1), 2*NEA_Y);
-        item.farPoint = CGPointMake(END_X*(i*2+1), 2*FAR_Y);
-        item.delegate = self;
-        [self addSubview:item];
-    }
-	
 	int tag = 1000 + _flag;
     StoryMenuItem *item = (StoryMenuItem *)[self viewWithTag:tag];
 	
 	CAKeyframeAnimation *positionAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
-    positionAnimation.duration = 2*TIME_OFFSET;
+    positionAnimation.duration = TIME_OFFSET;
     CGMutablePathRef path = CGPathCreateMutable();
-    CGPathMoveToPoint(path, NULL, item.startPoint.x, item.startPoint.y);
-    CGPathAddArcToPoint(path, NULL, 
-						item.startPoint.x-100, item.startPoint.y+100,
-						item.startPoint.x-100, item.startPoint.y+150,
-						M_PI);
-    CGPathAddLineToPoint(path, NULL, item.endPoint.x, item.endPoint.y);
+    CGPathMoveToPoint(path, NULL, item.center.x, item.center.y);
+	CGPathAddCurveToPoint(path, nil,item.center.x-200, item.center.y,item.center.x-200,item.center.y+240, item.center.x, item.center.y+240);
+	CGPathAddCurveToPoint(path, nil,item.center.x+200, item.center.y+240,item.center.x+200,item.center.y, item.center.x, item.center.y);
     positionAnimation.path = path;
     CGPathRelease(path);
     
@@ -282,9 +267,8 @@
     animationgroup.animations = [NSArray arrayWithObjects:positionAnimation, nil];
     animationgroup.duration = 2*TIME_OFFSET;
     animationgroup.fillMode = kCAFillModeForwards;
-    animationgroup.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn];
+    animationgroup.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionDefault];
     [item.layer addAnimation:animationgroup forKey:@"Expand"];
-    item.center = item.endPoint;
     
     _flag++;
 }
